@@ -9,6 +9,11 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@tiptap/extension-image": "latest",
+    "@tiptap/extension-link": "latest",
+    "@tiptap/pm": "latest",
+    "@tiptap/react": "latest",
+    "@tiptap/starter-kit": "latest",
     "@vitejs/plugin-react": "latest",
     "vite": "latest",
     "react": "latest",
