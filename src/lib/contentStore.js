@@ -17,6 +17,25 @@ function normalizeSlug(value) {
     .replace(/^-|-$/g, "");
 }
 
+function createDefaultBlocks(article) {
+  return [
+    {
+      id: `${article.id || article.slug}-block-1`,
+      type: "paragraph",
+      value: article.excerpt || ""
+    }
+  ];
+}
+
+function normalizeArticle(article) {
+  return {
+    ...article,
+    blocks: Array.isArray(article.blocks) && article.blocks.length > 0
+      ? article.blocks
+      : createDefaultBlocks(article)
+  };
+}
+
 export function createSlug(title, fallback = "article") {
   const base = normalizeSlug(title) || `${fallback}-${Date.now()}`;
   return base;
@@ -25,7 +44,7 @@ export function createSlug(title, fallback = "article") {
 export function getDefaultContentState() {
   return {
     categories: articleCategories,
-    articles: recentArticles
+    articles: recentArticles.map(normalizeArticle)
   };
 }
 
@@ -38,7 +57,7 @@ export function getContentState() {
     const parsed = JSON.parse(raw);
     return {
       categories: Array.isArray(parsed.categories) ? parsed.categories : articleCategories,
-      articles: Array.isArray(parsed.articles) ? parsed.articles : recentArticles
+      articles: Array.isArray(parsed.articles) ? parsed.articles.map(normalizeArticle) : recentArticles.map(normalizeArticle)
     };
   } catch {
     return getDefaultContentState();
@@ -58,7 +77,7 @@ export function upsertArticle(articleInput) {
   const slug = articleInput.slug || createSlug(articleInput.title);
   const existing = state.articles.find((item) => item.slug === slug);
 
-  const article = {
+  const article = normalizeArticle({
     id: existing?.id || `article-${Date.now()}`,
     slug,
     title: articleInput.title || "未命名文章",
@@ -68,8 +87,9 @@ export function upsertArticle(articleInput) {
     status: articleInput.status || existing?.status || "draft",
     publishedAt: articleInput.status === "published" ? existing?.publishedAt || now : existing?.publishedAt || null,
     updatedAt: now,
-    socialText: articleInput.socialText || ""
-  };
+    socialText: articleInput.socialText || "",
+    blocks: Array.isArray(articleInput.blocks) ? articleInput.blocks : existing?.blocks
+  });
 
   const articles = existing
     ? state.articles.map((item) => (item.slug === slug ? article : item))
