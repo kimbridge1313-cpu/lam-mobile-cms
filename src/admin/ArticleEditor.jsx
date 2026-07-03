@@ -1,14 +1,19 @@
-import { articleCategories, mediaItems } from "../data/mockData.js";
+import { useParams } from "react-router-dom";
+import { articleCategories, mediaItems, recentArticles } from "../data/mockData.js";
 
 const blockTypes = ["文字段落", "單張圖片", "引用文字", "按鈕連結"];
 
 export default function ArticleEditor() {
+  const { slug } = useParams();
+  const article = recentArticles.find((item) => item.slug === slug);
+  const isEditing = Boolean(article);
+
   return (
     <div className="admin-page-stack">
       <section className="admin-page-heading">
         <div>
-          <p className="eyebrow">New Article</p>
-          <h2>新增文章</h2>
+          <p className="eyebrow">{isEditing ? "Edit Article" : "New Article"}</p>
+          <h2>{isEditing ? "編輯文章" : "新增文章"}</h2>
           <p>第一版是前端表單原型，之後再接 Firestore 儲存。</p>
         </div>
       </section>
@@ -16,17 +21,17 @@ export default function ArticleEditor() {
       <form className="editor-form">
         <label className="form-field">
           <span>文章標題</span>
-          <input type="text" placeholder="輸入文章標題" />
+          <input type="text" placeholder="輸入文章標題" defaultValue={article?.title || ""} />
         </label>
 
         <label className="form-field">
           <span>副標題</span>
-          <input type="text" placeholder="一句說明文章的方向" />
+          <input type="text" placeholder="一句說明文章的方向" defaultValue={article?.subtitle || ""} />
         </label>
 
         <label className="form-field">
           <span>分類</span>
-          <select defaultValue={articleCategories[0]}>
+          <select defaultValue={article?.category || articleCategories[0]}>
             {articleCategories.map((category) => (
               <option key={category}>{category}</option>
             ))}
@@ -50,12 +55,12 @@ export default function ArticleEditor() {
 
         <label className="form-field">
           <span>摘要</span>
-          <textarea rows="4" placeholder="文章列表會使用這段摘要" />
+          <textarea rows="4" placeholder="文章列表會使用這段摘要" defaultValue={article?.excerpt || ""} />
         </label>
 
         <label className="form-field">
           <span>分享短文</span>
-          <textarea rows="4" placeholder="發布後可複製使用" />
+          <textarea rows="4" placeholder="發布後可複製使用" defaultValue={article?.socialText || ""} />
         </label>
 
         <section className="editor-blocks">
@@ -68,7 +73,7 @@ export default function ArticleEditor() {
 
           <article className="content-block-preview">
             <span>01</span>
-            <p>濕地不是遙遠的自然景觀，而是地方生活的一部分。</p>
+            <p>{article?.excerpt || "濕地不是遙遠的自然景觀，而是地方生活的一部分。"}</p>
           </article>
 
           <div className="chip-row">
@@ -80,17 +85,17 @@ export default function ArticleEditor() {
 
         <label className="form-field">
           <span>SEO 標題</span>
-          <input type="text" placeholder="可先沿用文章標題" />
+          <input type="text" placeholder="可先沿用文章標題" defaultValue={article?.title || ""} />
         </label>
 
         <label className="form-field">
           <span>SEO 描述</span>
-          <textarea rows="3" placeholder="搜尋結果與分享預覽描述" />
+          <textarea rows="3" placeholder="搜尋結果與分享預覽描述" defaultValue={article?.excerpt || ""} />
         </label>
 
         <div className="editor-action-bar">
           <button type="button" className="button button-secondary">儲存草稿</button>
-          <button type="button" className="button button-primary">發布</button>
+          <button type="button" className="button button-primary">{isEditing ? "更新" : "發布"}</button>
         </div>
       </form>
     </div>
