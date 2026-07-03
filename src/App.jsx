@@ -5,6 +5,7 @@ import AdminDashboard from "./admin/AdminDashboard.jsx";
 import AdminLayout from "./components/AdminLayout.jsx";
 import ArticleManager from "./admin/ArticleManager.jsx";
 import ArticleEditor from "./admin/ArticleEditor.jsx";
+import ArticleDetail from "./admin/ArticleDetail.jsx";
 import EventManager from "./admin/EventManager.jsx";
 import { mediaItems, reservations } from "./data/mockData.js";
 
@@ -178,6 +179,8 @@ export default function App() {
         <Route index element={<AdminDashboard />} />
         <Route path="articles" element={<ArticleManager />} />
         <Route path="articles/new" element={<ArticleEditor />} />
+        <Route path="articles/:slug" element={<ArticleDetail />} />
+        <Route path="articles/:slug/edit" element={<ArticleEditor />} />
         <Route path="events" element={<EventManager />} />
         <Route path="events/new" element={<EventEditor />} />
         <Route path="reservations" element={<ReservationManager />} />
