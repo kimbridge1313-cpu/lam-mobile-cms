@@ -1,5 +1,5 @@
 import { Link, useParams } from "react-router-dom";
-import { recentArticles } from "../data/mockData.js";
+import { getContentState } from "../lib/contentStore.js";
 
 const statusLabel = {
   published: "已發布",
@@ -9,7 +9,8 @@ const statusLabel = {
 
 export default function ArticleDetail() {
   const { slug } = useParams();
-  const article = recentArticles.find((item) => item.slug === slug);
+  const { articles } = getContentState();
+  const article = articles.find((item) => item.slug === slug);
 
   if (!article) {
     return (
@@ -41,13 +42,13 @@ export default function ArticleDetail() {
         <p>{article.excerpt}</p>
         <article className="content-block-preview">
           <span>01</span>
-          <p>{article.socialText}</p>
+          <p>{article.socialText || article.excerpt}</p>
         </article>
       </section>
 
       <section className="share-panel">
         <p className="eyebrow">Share Text</p>
-        <p>{article.socialText}</p>
+        <p>{article.socialText || "尚未設定分享短文。"}</p>
       </section>
 
       <div className="editor-action-bar detail-action-bar">
