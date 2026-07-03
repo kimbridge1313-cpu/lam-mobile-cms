@@ -17,6 +17,46 @@ function normalizeSlug(value) {
     .replace(/^-|-$/g, "");
 }
 
+function paragraphNode(text) {
+  if (!text) return { type: "paragraph" };
+  return {
+    type: "paragraph",
+    content: [{ type: "text", text }]
+  };
+}
+
+function contentJsonFromArticle(article) {
+  if (article.contentJson?.type === "doc") return article.contentJson;
+
+  const nodes = [];
+
+  if (Array.isArray(article.blocks) && article.blocks.length > 0) {
+    article.blocks.forEach((block) => {
+      if (block.type === "quote") {
+        nodes.push({
+          type: "blockquote",
+          content: [paragraphNode(block.value)]
+        });
+      } else if (block.type === "image" && block.value) {
+        nodes.push({ type: "image", attrs: { src: block.value, alt: block.alt || "" } });
+      } else if (block.type === "button") {
+        nodes.push(paragraphNode(block.label || "了解更多"));
+      } else {
+        nodes.push(paragraphNode(block.value || article.excerpt || ""));
+      }
+    });
+  }
+
+  if (nodes.length === 0) {
+    nodes.push(paragraphNode(article.excerpt || "開始撰寫文章內容。"));
+  }
+
+  return {
+    type: "doc",
+    content: nodes
+  };
+}
+
 function createDefaultBlocks(article) {
   return [
     {
@@ -32,7 +72,8 @@ function normalizeArticle(article) {
     ...article,
     blocks: Array.isArray(article.blocks) && article.blocks.length > 0
       ? article.blocks
-      : createDefaultBlocks(article)
+      : createDefaultBlocks(article),
+    contentJson: contentJsonFromArticle(article)
   };
 }
 
@@ -88,7 +129,8 @@ export function upsertArticle(articleInput) {
     publishedAt: articleInput.status === "published" ? existing?.publishedAt || now : existing?.publishedAt || null,
     updatedAt: now,
     socialText: articleInput.socialText || "",
-    blocks: Array.isArray(articleInput.blocks) ? articleInput.blocks : existing?.blocks
+    blocks: Array.isArray(articleInput.blocks) ? articleInput.blocks : existing?.blocks,
+    contentJson: articleInput.contentJson || existing?.contentJson
   });
 
   const articles = existing
