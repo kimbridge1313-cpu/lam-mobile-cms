@@ -1,42 +1,8 @@
 import { useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { mediaItems } from "../data/mockData.js";
+import TiptapEditor from "../components/editor/TiptapEditor.jsx";
 import { createSlug, getContentState, upsertArticle } from "../lib/contentStore.js";
-
-const blockTypes = [
-  { type: "paragraph", label: "文字段落" },
-  { type: "image", label: "單張圖片" },
-  { type: "quote", label: "引用文字" },
-  { type: "button", label: "按鈕連結" }
-];
-
-const blockLabels = {
-  paragraph: "文字段落",
-  image: "單張圖片",
-  quote: "引用文字",
-  button: "按鈕連結"
-};
-
-function createBlock(type) {
-  const base = {
-    id: `block-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
-    type
-  };
-
-  if (type === "image") {
-    return { ...base, value: "", alt: "" };
-  }
-
-  if (type === "button") {
-    return { ...base, label: "了解更多", url: "" };
-  }
-
-  if (type === "quote") {
-    return { ...base, value: "" };
-  }
-
-  return { ...base, value: "" };
-}
 
 export default function ArticleEditor() {
   const navigate = useNavigate();
@@ -58,26 +24,10 @@ export default function ArticleEditor() {
     seoDescription: article?.excerpt || ""
   });
 
-  const [blocks, setBlocks] = useState(() => article?.blocks || [createBlock("paragraph")]);
+  const [contentJson, setContentJson] = useState(() => article?.contentJson || null);
 
   function updateField(field, value) {
     setForm((current) => ({ ...current, [field]: value }));
-  }
-
-  function addBlock(type) {
-    setBlocks((current) => [...current, createBlock(type)]);
-  }
-
-  function updateBlock(blockId, field, value) {
-    setBlocks((current) =>
-      current.map((block) =>
-        block.id === blockId ? { ...block, [field]: value } : block
-      )
-    );
-  }
-
-  function removeBlock(blockId) {
-    setBlocks((current) => current.filter((block) => block.id !== blockId));
   }
 
   function saveArticle(status) {
@@ -85,7 +35,7 @@ export default function ArticleEditor() {
       ...form,
       slug: article?.slug || createSlug(form.title),
       status,
-      blocks
+      contentJson
     });
     navigate(`/admin/articles/${savedArticle.slug}`);
   }
@@ -168,108 +118,14 @@ export default function ArticleEditor() {
           />
         </label>
 
-        <section className="editor-blocks">
+        <section className="editor-blocks rich-editor-panel">
           <div className="admin-section-header compact-header">
             <div>
-              <p className="eyebrow">Blocks</p>
-              <h3>內容區塊</h3>
+              <p className="eyebrow">Content</p>
+              <h3>文章內容</h3>
             </div>
           </div>
-
-          <div className="block-editor-list">
-            {blocks.map((block, index) => (
-              <article className="block-editor-card" key={block.id}>
-                <div className="block-editor-header">
-                  <span>{String(index + 1).padStart(2, "0")}</span>
-                  <strong>{blockLabels[block.type]}</strong>
-                  <button type="button" onClick={() => removeBlock(block.id)}>刪除</button>
-                </div>
-
-                {block.type === "paragraph" && (
-                  <label className="form-field">
-                    <span>段落內容</span>
-                    <textarea
-                      rows="4"
-                      placeholder="輸入文字段落"
-                      value={block.value || ""}
-                      onChange={(event) => updateBlock(block.id, "value", event.target.value)}
-                    />
-                  </label>
-                )}
-
-                {block.type === "quote" && (
-                  <label className="form-field">
-                    <span>引用文字</span>
-                    <textarea
-                      rows="3"
-                      placeholder="輸入引用文字"
-                      value={block.value || ""}
-                      onChange={(event) => updateBlock(block.id, "value", event.target.value)}
-                    />
-                  </label>
-                )}
-
-                {block.type === "image" && (
-                  <div className="form-grid two-columns">
-                    <label className="form-field">
-                      <span>圖片網址</span>
-                      <input
-                        type="text"
-                        placeholder="先填圖片網址，之後接媒體庫"
-                        value={block.value || ""}
-                        onChange={(event) => updateBlock(block.id, "value", event.target.value)}
-                      />
-                    </label>
-                    <label className="form-field">
-                      <span>替代文字</span>
-                      <input
-                        type="text"
-                        placeholder="圖片說明"
-                        value={block.alt || ""}
-                        onChange={(event) => updateBlock(block.id, "alt", event.target.value)}
-                      />
-                    </label>
-                  </div>
-                )}
-
-                {block.type === "button" && (
-                  <div className="form-grid two-columns">
-                    <label className="form-field">
-                      <span>按鈕文字</span>
-                      <input
-                        type="text"
-                        placeholder="例如：立即預約"
-                        value={block.label || ""}
-                        onChange={(event) => updateBlock(block.id, "label", event.target.value)}
-                      />
-                    </label>
-                    <label className="form-field">
-                      <span>連結網址</span>
-                      <input
-                        type="text"
-                        placeholder="https://"
-                        value={block.url || ""}
-                        onChange={(event) => updateBlock(block.id, "url", event.target.value)}
-                      />
-                    </label>
-                  </div>
-                )}
-              </article>
-            ))}
-          </div>
-
-          <div className="chip-row">
-            {blockTypes.map((blockType) => (
-              <button
-                type="button"
-                className="filter-chip"
-                key={blockType.type}
-                onClick={() => addBlock(blockType.type)}
-              >
-                ＋ {blockType.label}
-              </button>
-            ))}
-          </div>
+          <TiptapEditor value={contentJson} onChange={setContentJson} />
         </section>
 
         <label className="form-field">
