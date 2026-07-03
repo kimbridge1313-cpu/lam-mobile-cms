@@ -20,6 +20,7 @@ function StatusPill({ status }) {
   const labelMap = {
     published: "已發布",
     draft: "草稿",
+    archived: "下架",
     open: "開放中",
     pending: "待確認",
     confirmed: "已確認"
@@ -44,12 +45,12 @@ export default function AdminDashboard() {
       </section>
 
       <section className="quick-actions" aria-label="快速操作">
-        <Link to="/admin/articles" className="quick-action-card">
+        <Link to="/admin/articles/new" className="quick-action-card">
           <span>＋</span>
           <strong>新增文章</strong>
         </Link>
 
-        <Link to="/admin/events" className="quick-action-card">
+        <Link to="/admin/events/new" className="quick-action-card">
           <span>＋</span>
           <strong>新增活動</strong>
         </Link>
