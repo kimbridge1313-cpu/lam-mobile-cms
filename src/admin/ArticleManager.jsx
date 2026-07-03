@@ -1,6 +1,12 @@
 import { Link } from "react-router-dom";
 import { articleCategories, recentArticles } from "../data/mockData.js";
 
+const statusLabel = {
+  published: "已發布",
+  draft: "草稿",
+  archived: "已下架"
+};
+
 export default function ArticleManager() {
   return (
     <div className="admin-page-stack">
@@ -32,14 +38,21 @@ export default function ArticleManager() {
       <section className="stack-list">
         {recentArticles.map((article) => (
           <article className="manager-card" key={article.id}>
-            <div className="manager-card-media">{article.category}</div>
-            <div className="manager-card-body">
-              <div className="meta-row">
-                <span>{article.updatedAt}</span>
-                <span className={`status-pill status-${article.status}`}>{article.status}</span>
+            <Link to={`/admin/articles/${article.slug}`} className="manager-card-link">
+              <div className="manager-card-media">{article.category}</div>
+              <div className="manager-card-body">
+                <div className="meta-row">
+                  <span>{article.updatedAt}</span>
+                  <span className={`status-pill status-${article.status}`}>{statusLabel[article.status] || article.status}</span>
+                </div>
+                <h3>{article.title}</h3>
+                <p>{article.excerpt}</p>
               </div>
-              <h3>{article.title}</h3>
-              <p>{article.excerpt}</p>
+            </Link>
+            <div className="card-actions manager-card-actions">
+              <Link to={`/admin/articles/${article.slug}`}>查看</Link>
+              <Link to={`/admin/articles/${article.slug}/edit`}>編輯</Link>
+              <button type="button">分享</button>
             </div>
           </article>
         ))}
