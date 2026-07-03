@@ -38,21 +38,18 @@ export default function ArticleManager() {
       <section className="stack-list">
         {recentArticles.map((article) => (
           <article className="manager-card" key={article.id}>
-            <Link to={`/admin/articles/${article.slug}`} className="manager-card-link">
-              <div className="manager-card-media">{article.category}</div>
-              <div className="manager-card-body">
-                <div className="meta-row">
-                  <span>{article.updatedAt}</span>
-                  <span className={`status-pill status-${article.status}`}>{statusLabel[article.status] || article.status}</span>
-                </div>
-                <h3>{article.title}</h3>
-                <p>{article.excerpt}</p>
+            <div className="manager-card-media">{article.category}</div>
+            <div className="manager-card-body">
+              <div className="meta-row">
+                <span>{article.updatedAt}</span>
+                <span className={`status-pill status-${article.status}`}>{statusLabel[article.status] || article.status}</span>
               </div>
-            </Link>
-            <div className="card-actions manager-card-actions">
-              <Link to={`/admin/articles/${article.slug}`}>查看</Link>
-              <Link to={`/admin/articles/${article.slug}/edit`}>編輯</Link>
-              <button type="button">分享</button>
+              <h3>{article.title}</h3>
+              <p>{article.excerpt}</p>
+              <div className="card-actions">
+                <Link to={`/admin/articles/${article.slug}`}>查看文章</Link>
+                <Link to={`/admin/articles/${article.slug}/edit`}>編輯</Link>
+              </div>
             </div>
           </article>
         ))}
