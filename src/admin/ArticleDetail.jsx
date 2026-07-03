@@ -1,4 +1,5 @@
 import { Link, useParams } from "react-router-dom";
+import TiptapEditor from "../components/editor/TiptapEditor.jsx";
 import { getContentState } from "../lib/contentStore.js";
 
 const statusLabel = {
@@ -6,43 +7,6 @@ const statusLabel = {
   draft: "草稿",
   archived: "已下架"
 };
-
-function ArticleBlock({ block, index }) {
-  if (block.type === "quote") {
-    return (
-      <article className="content-block-preview quote-block">
-        <span>{String(index + 1).padStart(2, "0")}</span>
-        <blockquote>{block.value || "尚未輸入引用文字。"}</blockquote>
-      </article>
-    );
-  }
-
-  if (block.type === "image") {
-    return (
-      <article className="content-block-preview image-block">
-        <span>{String(index + 1).padStart(2, "0")}</span>
-        {block.value ? <img src={block.value} alt={block.alt || "文章圖片"} /> : <p>尚未設定圖片網址。</p>}
-        {block.alt && <small>{block.alt}</small>}
-      </article>
-    );
-  }
-
-  if (block.type === "button") {
-    return (
-      <article className="content-block-preview button-block">
-        <span>{String(index + 1).padStart(2, "0")}</span>
-        <a href={block.url || "#"}>{block.label || "了解更多"}</a>
-      </article>
-    );
-  }
-
-  return (
-    <article className="content-block-preview">
-      <span>{String(index + 1).padStart(2, "0")}</span>
-      <p>{block.value || "尚未輸入段落內容。"}</p>
-    </article>
-  );
-}
 
 export default function ArticleDetail() {
   const { slug } = useParams();
@@ -77,9 +41,7 @@ export default function ArticleDetail() {
 
       <section className="article-detail-body">
         <p>{article.excerpt}</p>
-        {(article.blocks || []).map((block, index) => (
-          <ArticleBlock key={block.id} block={block} index={index} />
-        ))}
+        <TiptapEditor value={article.contentJson} editable={false} />
       </section>
 
       <section className="share-panel">
